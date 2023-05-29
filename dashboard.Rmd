@@ -1,0 +1,82 @@
+---
+title: "Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny #Interação
+---
+
+```{r setup, include=FALSE}
+#Dashboard
+library(flexdashboard)
+
+#Gráficos
+library(ggplot2)
+library(plotly)
+
+#Tabelas
+library(dplyr)
+
+#Dados financeiros
+library(tidyquant)
+```
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+```{r}
+selectInput(
+  "ticker", 
+  "Escolha o ticker:", 
+  choices = c("PETR4.SA", "BBAS3.SA", "VALE3.SA", "WEGE3.SA")
+)
+```
+
+
+
+```{r download}
+dados_tbl <- reactive({
+  tq_get(input$ticker)
+})
+```
+
+
+Column {data-width=300}
+-----------------------------------------------------------------------
+
+### Cotações
+
+```{r}
+renderDataTable({
+  dados_tbl() %>% 
+    select(date, adjusted) %>% 
+    arrange(desc(date))
+})
+
+```
+
+Column {data-width=700}
+-----------------------------------------------------------------------
+
+### Gráfico da ação
+
+```{r}
+renderPlotly({
+  dados_tbl() %>%
+    ggplot(aes(x = date, y = adjusted)) +
+    geom_line()
+})
+```
+
+### Gráfico comparativo
+
+```{r}
+renderPlotly({
+  tq_get(c("PETR4.SA", "BBAS3.SA", "VALE3.SA", "WEGE3.SA")) %>%
+    group_by(symbol) %>% 
+    mutate(cotacao = (adjusted - mean(adjusted)) / sd(adjusted)) %>% 
+    ungroup() %>% 
+    ggplot(aes(x = date, y = cotacao, color = symbol)) +
+    geom_line()
+})
+```
