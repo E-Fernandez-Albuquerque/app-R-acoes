@@ -1,0 +1,13 @@
+name: dashboard
+title: dashboard
+username:
+account: Eric Gabriel Fernandez Albuquerque da Silva
+server: posit.cloud
+hostUrl: https://api.shinyapps.io/v1
+appId: 9247114
+bundleId: 7304317
+url: https://posit.cloud/content/6061516
+when: 1685933519.46394
+lastSyncTime: 1685933519.46395
+asMultiple: FALSE
+asStatic: FALSE

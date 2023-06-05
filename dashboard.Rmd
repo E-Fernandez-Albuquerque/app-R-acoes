@@ -2,8 +2,10 @@
 title: "Dashboard"
 output: 
   flexdashboard::flex_dashboard:
+    theme: cerulean
     orientation: columns
     vertical_layout: fill
+    source_code: "https://github.com/E-Fernandez-Albuquerque/app-R-acoes"
 runtime: shiny #Interação
 ---
 
@@ -22,13 +24,13 @@ library(dplyr)
 library(tidyquant)
 ```
 
-Column {.sidebar}
+Column {.sidebar data-width=150}
 -----------------------------------------------------------------------
 ```{r}
 selectInput(
   "ticker", 
   "Escolha o ticker:", 
-  choices = c("PETR4.SA", "BBAS3.SA", "VALE3.SA", "WEGE3.SA")
+  choices = c("OIBR3.SA", "MGLU3.SA", "AMER3.SA", "CVCB3.SA", "PETZ3.SA")
 )
 ```
 
@@ -41,7 +43,7 @@ dados_tbl <- reactive({
 ```
 
 
-Column {data-width=300}
+Column {data-width=450}
 -----------------------------------------------------------------------
 
 ### Cotações
@@ -51,11 +53,11 @@ renderDataTable({
   dados_tbl() %>% 
     select(date, adjusted) %>% 
     arrange(desc(date))
-})
+}, options = list (iDisplayLength = 10))
 
 ```
 
-Column {data-width=700}
+Column {data-width=550}
 -----------------------------------------------------------------------
 
 ### Gráfico da ação
@@ -64,7 +66,8 @@ Column {data-width=700}
 renderPlotly({
   dados_tbl() %>%
     ggplot(aes(x = date, y = adjusted)) +
-    geom_line()
+    geom_line(colour='#6121dc') +
+    theme_minimal()
 })
 ```
 
@@ -72,11 +75,12 @@ renderPlotly({
 
 ```{r}
 renderPlotly({
-  tq_get(c("PETR4.SA", "BBAS3.SA", "VALE3.SA", "WEGE3.SA")) %>%
+  tq_get(c("OIBR3.SA", "MGLU3.SA", "AMER3.SA", "CVCB3.SA", "PETZ3.SA")) %>%
     group_by(symbol) %>% 
     mutate(cotacao = (adjusted - mean(adjusted)) / sd(adjusted)) %>% 
     ungroup() %>% 
     ggplot(aes(x = date, y = cotacao, color = symbol)) +
-    geom_line()
+    geom_line() + 
+    theme_minimal()
 })
 ```
